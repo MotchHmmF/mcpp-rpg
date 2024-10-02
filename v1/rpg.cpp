@@ -1,10 +1,13 @@
 #include <mcpp/mcpp.h>
+#include "../Structures/Structures.h"
 
 class RPG {
     private:
         mcpp::MinecraftConnection mc;
         mcpp::Coordinate origin;
         mcpp::Coordinate printer;
+
+        std::vector<mcpp::BlockType> blocks;
 
         double difficultyMultiplier;
         double shopPrices;
@@ -34,8 +37,9 @@ void RPG::SelectSettings() {
 }
 
 void RPG::TestArea() {
-    printer = origin;
-    printer.x += 50;
-    printer.z += 50;
+    Structure test;
+    test.TESTA();
+    test.Print(origin, mc);
+    // std::cout<<blocks.max_size();
     
 }
