@@ -9,22 +9,38 @@ class Structure {
         std::vector<mcpp::Coordinate> spawners;
     public:
         void Print(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc);
+        void SummonSpawners(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc);
         void TESTA();
 };
 
 void Structure::Print(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc) {
     mcpp::Coordinate printer = origin;
+    int position;
+
+    printer.x += X_SIZE-1;
+    printer.y += Y_SIZE-1;
+    printer.z += Z_SIZE-1;
+    mcpp::Chunk area = mc.getBlocks(origin,printer);
+
     for (int x = 0; x < X_SIZE; x++) {
         for (int y = 0; y < Y_SIZE; y++) {
             for (int z = 0; z < Z_SIZE; z++) {
+                position = z+y*Z_SIZE+x*Z_SIZE*Y_SIZE;
+                if (area.get(x,y,z) != blocks.at(position)) {
+                    printer.x = origin.x+x;
+                    printer.y = origin.y+y;
+                    printer.z = origin.z+z;
 
-                printer.x = origin.x+x;
-                printer.y = origin.y+y;
-                printer.z = origin.z+z;
-
-                mc.setBlock(printer,blocks.at(z+y*Z_SIZE+x*Z_SIZE*Y_SIZE));
+                    mc.setBlock(printer,blocks.at(position));
+                }
             }
         }
+    }
+}
+
+void Structure::SummonSpawners(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc) {
+    for (mcpp::Coordinate location : spawners) {
+        mc.postToChat("TODO, Write summon armour stand code");
     }
 }
 
