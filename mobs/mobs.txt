@@ -1,0 +1,7 @@
+Ranged = Skeleton, Stray, Blaze
+Meelee = Zombie, Husk, Wither_SKeleton
+Spider = Spider, Cave Spider
+Tiny = Silverfish, Endermite
+Slimes = Slime, Magma_Cube
+Raiders = Pillager, Vindicator, Evoker, Ravenger
+Guardians = Guardian, Elder Guardian
