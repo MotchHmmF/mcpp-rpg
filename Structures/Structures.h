@@ -1,5 +1,6 @@
 #include <mcpp/mcpp.h>
 #include <unistd.h>
+#include <unordered_set>
 
 class Structure {
     
@@ -7,14 +8,20 @@ class Structure {
         int X_SIZE, Y_SIZE, Z_SIZE;
         std::vector<mcpp::BlockType> blocks;
         std::vector<mcpp::Coordinate> spawners;
+        std::vector<mcpp::Coordinate> stairs;
+        std::unordered_set<int> stairIds = {53,67,108,109,114,128,134,135,136,156,163,164,180,203};
     public:
         void Print(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc);
+        void PrintStairs(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc);
         void SummonSpawners(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc);
         void TESTA();
+        void TESTB();
 };
 
 void Structure::Print(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc) {
     mcpp::Coordinate printer = origin;
+    std::vector<mcpp::Coordinate> cornerStairs;
+    stairs.clear();
     int position;
 
     printer.x += X_SIZE-1;
@@ -26,12 +33,51 @@ void Structure::Print(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc) {
         for (int y = 0; y < Y_SIZE; y++) {
             for (int z = 0; z < Z_SIZE; z++) {
                 position = z+y*Z_SIZE+x*Z_SIZE*Y_SIZE;
+                if (stairIds.find(blocks.at(position).id) != stairIds.end()
+                && blocks.at(position).mod == 0) {
+                    stairs.push_back(mcpp::Coordinate(x,y,z));
+                }
                 if (area.get(x,y,z) != blocks.at(position)) {
                     printer.x = origin.x+x;
                     printer.y = origin.y+y;
                     printer.z = origin.z+z;
 
                     mc.setBlock(printer,blocks.at(position));
+                }
+            }
+        }
+    }
+    PrintStairs(origin,mc);
+}
+
+void Structure::PrintStairs(mcpp::Coordinate origin, mcpp::MinecraftConnection& mc) {
+    // mc.postToChat("Printing Stairs");
+    mcpp::Coordinate printer;
+    int stairPosition, position;
+    for (mcpp::Coordinate loc : stairs) {
+        printer.x = origin.x+loc.x;
+        printer.y = origin.y+loc.y;
+        printer.z = origin.z+loc.z;
+        stairPosition = loc.z + loc.y * Z_SIZE + loc.x * Z_SIZE * Y_SIZE;
+
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                if ((x+z) != 0 && (x+z)!= -2 && (x+z) != 2) {
+                    position = (loc.z + z)+loc.y*Z_SIZE+(loc.x + x)*Z_SIZE*Y_SIZE;
+                    if (stairIds.find(blocks.at(position).id) != stairIds.end()) {
+                        // mc.postToChat("Stairs Neighour");
+                        // std::cout<<loc<<" "<<blocks.at(position)<<std::endl;
+                        // mc.setPlayerTilePosition(printer);
+                        // usleep(100000);
+                        mc.setBlock(printer,mcpp::BlockType(blocks.at(stairPosition).id,blocks.at(position).mod));
+                        printer.x+=x;
+                        printer.z+=z;
+                        mc.setBlock(printer,mcpp::Blocks::AIR);
+                        // usleep(100000);
+                        mc.setBlock(printer,blocks.at(position));
+                        x+=4;
+                        z+=4;
+                    }
                 }
             }
         }
@@ -53,3 +99,14 @@ void Structure::TESTA() {
     spawners.clear();
     spawners={mcpp::Coordinate(3,3,5),mcpp::Coordinate(5,4,16),mcpp::Coordinate(8,2,23),mcpp::Coordinate(12,3,18),mcpp::Coordinate(14,4,10),mcpp::Coordinate(16,4,25),mcpp::Coordinate(24,4,17),mcpp::Coordinate(25,3,5)};
 }
+
+void Structure::TESTB() {
+    X_SIZE = 7;
+    Y_SIZE = 3;
+    Z_SIZE = 7;
+    blocks.clear();
+    blocks={mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,0),mcpp::BlockType(109,0),mcpp::BlockType(109,0),mcpp::BlockType(109,0),mcpp::BlockType(109,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,2),mcpp::BlockType(2,0),mcpp::BlockType(2,0),mcpp::BlockType(2,0),mcpp::BlockType(109,3),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,0),mcpp::BlockType(109,0),mcpp::BlockType(109,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,2),mcpp::BlockType(2,0),mcpp::BlockType(2,0),mcpp::BlockType(2,0),mcpp::BlockType(109,3),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,2),mcpp::BlockType(2,0),mcpp::BlockType(109,3),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(41,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,2),mcpp::BlockType(2,0),mcpp::BlockType(2,0),mcpp::BlockType(2,0),mcpp::BlockType(109,3),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,0),mcpp::BlockType(109,1),mcpp::BlockType(109,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(109,0),mcpp::BlockType(109,1),mcpp::BlockType(109,1),mcpp::BlockType(109,1),mcpp::BlockType(109,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0),mcpp::BlockType(0,0)};
+    spawners.clear();
+    spawners={};
+}
+

@@ -38,7 +38,7 @@ void RPG::TestArea() {
     Structure test;
     test.TESTA();
     test.Print(origin, mc);
-    test.SummonSpawners(origin,mc);
+    // test.SummonSpawners(origin,mc);
     // std::cout<<blocks.max_size();
     
 }
